@@ -20,7 +20,7 @@ $(OBJ_DIR)/%.o:%.cpp
 	$(CC) -c -ggdb -o $@ $<
 
 $(program_NAME): $(program_CXX_OBJS)
-	$(CC) $(program_CXX_OBJS) -ggdb -Llib -framework Cocoa -framework OpenGL -lglew -lglfw -framework IOKit -framework SDL -framework SDL_image -o $(program_NAME)
+	$(CC) $(program_CXX_OBJS) -W#pragma-messages -ggdb -Llib -framework Cocoa -framework OpenGL -lglew -lglfw -framework IOKit -framework SDL -framework SDL_image -o $(program_NAME)
 
 clean:
 	@- $(RM) bin/$(program_NAME)

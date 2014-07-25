@@ -2,6 +2,9 @@
 #include "include/GL/glfw.h"
 #include <cstdlib>
 #include <iostream>
+#include "include/glm/glm.hpp"
+#include "include/glm/gtc/matrix_transform.hpp"
+#include "include/glm/gtc/type_ptr.hpp"
 
 GLuint program;
 
@@ -113,8 +116,9 @@ int main(int argc, char* argv[]) {
         std::cout << "Error: " << glewGetErrorString(result) << std::endl;
     }
 
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+
 
     std::cout << "VENDOR: " << glGetString(GL_VENDOR) << std::endl;
     std::cout << "RENDERER: " << glGetString(GL_RENDERER) << std::endl;
@@ -124,51 +128,104 @@ int main(int argc, char* argv[]) {
     setShaders();
 
     GLfloat vertices[] = {
-        0.0f, 0.5f, 0.f,
-        -0.5f, -0.5f, 0.f,
-        0.5f, -0.5f, 0.f
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 
+        0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 
+        0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 
+        -0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 
+        0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 
+        0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 
+        -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+
+        0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 
+        0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 
+        0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 
+        0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 
+
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 
+        0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 1.0f, 
+        0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 1.0f, 
+        -0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 1.0f,
+        0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 
+        0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 
+        0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 
+        -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 1.0f
     };
 
-    GLfloat colors[] = {
-        1.0f, 0.f, 0.f,
-        0.f, 1.0f, 0.f,
-        0.f, 0.f, 1.0f
-    };
 
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
 
-    GLuint VertexArrayID;
-    glGenVertexArrays(1, &VertexArrayID);
-    glBindVertexArray(VertexArrayID);
-
-    GLuint vertexbuffer;
-    
-    glGenBuffers(1, &vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     GLuint pos = glGetAttribLocation(program, "position");
     glEnableVertexAttribArray(pos);
-    glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    GLuint colorbuffer;
-    
-    glGenBuffers(1, &colorbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+    glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
 
     GLuint col = glGetAttribLocation(program, "color");
     glEnableVertexAttribArray(col);
-    glVertexAttribPointer(col, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(col, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+
+
+
+    glm::mat4 view = glm::lookAt(
+        glm::vec3(2.0f, 2.0f, 2.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 1.0f)
+        );
+    GLint uniView = glGetUniformLocation(program, "view");
+    glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
+
+    glm::mat4 proj = glm::perspective(60.0f, 800.0f / 600.0f, 1.0f, 10.0f);
+    GLint uniProj = glGetUniformLocation(program, "proj");
+    glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
+
+    GLint uniModel = glGetUniformLocation(program, "model");
 
     glClearColor(1.0, 1.0, 1.0, 1.0);
+//    glClearDepth(0.0f);
+    float rotation = 0.0f;
 
     while (glfwGetWindowParam(GLFW_OPENED)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glm::mat4 model;
+        rotation += 3.0f;
+        model = glm::rotate(model, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
+        glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+
+
+        //glDepthRange(1.0f, 1.0f);
+         glDepthFunc(GL_LESS);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
 
         glfwSwapBuffers();        
-        glfwSleep(0.001);
+        glfwSleep(0.016);
 
    }
     
